@@ -3,7 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-/libs/SFML-2.6.1/*
 # User-specific files
 *.rsuser
 *.suo
