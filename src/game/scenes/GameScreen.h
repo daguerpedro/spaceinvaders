@@ -4,16 +4,20 @@
 
 class GameScreen : public SceneManager::Scene {
 private:
-	Entity ship{ "./resources/ship1.png", { 0.1f, 0.1f }, this };
+	sf::Texture sTexture{};
+	sf::Sprite ship{sTexture};
 public:
 	GameScreen() : Scene("gamescreen")
 	{
+		sTexture.loadFromFile("./resources/sprites/ship1.png");
+		sTexture.setSmooth(true);
 
+		ship.setScale(.1f, .1f);
 	}
 
 	void onActive() override {
 		auto view = Engine::instance->getWindow()->getView();
-		ship.sprite.setPosition(view.getCenter().x, view.getSize().y - ship.sprite.getGlobalBounds().getSize().y);
+		ship.setPosition(view.getCenter().x, view.getSize().y - ship.getGlobalBounds().getSize().y);
 	}
 
 	void onUpdate() override {
@@ -42,22 +46,22 @@ public:
 
 
 		auto npos = sf::Vector2f{
-			ship.sprite.getPosition().x + (dir.x * speed * Engine::instance->deltaTime),
-			ship.sprite.getPosition().y + (dir.y * speed * 1.6f * Engine::instance->deltaTime)
+			ship.getPosition().x + (dir.x * speed * Engine::instance->deltaTime),
+			ship.getPosition().y + (dir.y * speed * 1.6f * Engine::instance->deltaTime)
 		};
 
 		if (!(
-			npos.x > ship.sprite.getGlobalBounds().width / 2 &&
-			npos.x < (view.getSize().x - ship.sprite.getGlobalBounds().width / 2)
+			npos.x > ship.getGlobalBounds().width / 2 &&
+			npos.x < (view.getSize().x - ship.getGlobalBounds().width / 2)
 			))
-			npos.x = ship.sprite.getPosition().x;
+			npos.x = ship.getPosition().x;
 
 		if (!(
 			npos.y > (view.getSize().y / 2) &&
-			npos.y < (view.getSize().y - ship.sprite.getGlobalBounds().height / 2)
+			npos.y < (view.getSize().y - ship.getGlobalBounds().height / 2)
 			))
-			npos.y = ship.sprite.getPosition().y;
+			npos.y = ship.getPosition().y;
 
-		ship.sprite.setPosition(npos);
+		ship.setPosition(npos);
 	}
 };

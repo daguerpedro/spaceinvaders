@@ -12,7 +12,7 @@ public:
 	public:
 		std::string name;
 		Scene(const std::string& scene_name) : name(scene_name) {
-			scene_entities = std::vector<sf::Sprite*>();
+			scene_entities = std::vector<sf::Drawable*>();
 		}
 
 		sf::Color backcolor;
@@ -22,7 +22,8 @@ public:
 
 		bool isActive = false;
 
-		std::vector<sf::Sprite*> scene_entities;
+		std::vector<sf::Drawable*> scene_entities;
+		void addEntity(sf::Drawable* e) { scene_entities.push_back(e); }
 	};
 
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SceneManager.h"
-#include "Entity.h"
+
 #include <functional>
 #include <iostream>
 
@@ -20,7 +20,6 @@ private:
 			sf::sleep(sf::milliseconds(20));
 		} while (!Engine::instance->win.isOpen());
 
-
 		while (Engine::instance->win.isOpen())
 		{
 			// sf::Lock lock(mutex);
@@ -33,7 +32,8 @@ private:
 			if (SceneManager::getActive() != nullptr)
 				if(SceneManager::getActive()->isActive)
 					for (auto e : SceneManager::getActive()->scene_entities)
-						Engine::instance->win.draw(*e);
+						if(e != nullptr)
+							Engine::instance->win.draw(*e);
 
 			Engine::instance->win.display();
 		}

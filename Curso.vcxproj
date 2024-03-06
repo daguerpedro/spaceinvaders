@@ -23,7 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\Engine.h" />
-    <ClInclude Include="src\engine\Entity.h" />
     <ClInclude Include="src\game\scenes\GameScreen.h" />
     <ClInclude Include="src\game\scenes\Loadscreen.h" />
     <ClInclude Include="src\engine\SceneManager.h" />

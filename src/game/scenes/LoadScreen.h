@@ -1,27 +1,22 @@
 #pragma once
 
 #include "..\..\engine\Engine.h"
+#include <string>
 
 class LoadScreen : public SceneManager::Scene {
 private:
-	void waiter()
-	{
-		printf("[LOADSCREEN] WAITING.\n");		
-		sf::sleep(sf::seconds(5));
-		printf("[LOADSCREEN] COMPLETE.\n");
-
-		SceneManager::loadScene("gamescreen");
-	};
-
+	sf::Font font{};
+	sf::Text title{ "SPACE INVADERS", font, 25 };
 public:
 	LoadScreen() : Scene("loadscreen")
 	{
-		backcolor = sf::Color::Blue;
+		font.loadFromFile("./resources/fonts/8bitOperatorPlus8-Bold.ttf");
+		addEntity(&title);
 	}
 
 	void onActive() override {
-		sf::Thread wait(&LoadScreen::waiter, this);
-		wait.launch();
+		auto view = Engine::instance->getWindow()->getView();
+		title.setPosition((view.getCenter().x)/2, 15);
 	}
 
 	void onUpdate() override {

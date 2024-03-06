@@ -23,9 +23,6 @@
     <ClInclude Include="src\engine\SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\Entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\engine\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
