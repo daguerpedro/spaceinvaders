@@ -88,7 +88,7 @@ public:
 			sf::Event e;
 			while (win.pollEvent(e))
 			{
-				if (e.type == sf::Event::Closed || (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape))
+				if (e.type == sf::Event::Closed || (e.type == sf::Event::KeyPressed && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::C))))
 				{
 					shouldRun = false;
 				}

@@ -21,6 +21,7 @@ public:
 		virtual void onActive() {};
 
 		bool isActive = false;
+		bool firstSetup = true;
 
 		std::vector<sf::Drawable*> scene_entities;
 		void addEntity(sf::Drawable* e) { scene_entities.push_back(e); }

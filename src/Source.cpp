@@ -6,12 +6,17 @@
 void tick()
 {
 	// Input & Math;
-	
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		if(SceneManager::getActive()->name == "gamescreen")
+			SceneManager::loadScene("loadscreen");
+	}
 }
 
 void start()
 {
 	SceneManager::loadScene("loadscreen");
+	//SceneManager::loadScene("gamescreen");
 }
 
 int main()
