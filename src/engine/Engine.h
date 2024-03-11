@@ -20,6 +20,8 @@ private:
 			sf::sleep(sf::milliseconds(20));
 		} while (!Engine::instance->win.isOpen());
 
+		sf::sleep(sf::milliseconds(10));
+
 		while (Engine::instance->win.isOpen())
 		{
 			// sf::Lock lock(mutex);
@@ -74,9 +76,7 @@ public:
 		shouldRun = true;
 		time.restart();
 
-		printf("[ENGINE] Starting graphics thread.\n");
 		sf::Thread graphics{ &renderThread };
-		graphics.launch();
 
 		printf("[ENGINE] Starting main thread\n");
 
@@ -97,6 +97,10 @@ public:
 			if (!setup)
 			{
 				setup = true;
+
+				printf("[ENGINE] Starting graphics thread.\n");
+				graphics.launch();
+
 				if (onStart != NULL)  onStart();
 			}
 

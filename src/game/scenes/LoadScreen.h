@@ -39,25 +39,22 @@ public:
 	/*
 	Don't instantiate objects in the scene constructors, this will cause all the objects defined here to be instantiated when the program starts, causing slowdowns or making the program save them in memory even before it needs them.
 	*/
-	LoadScreen() : Scene("loadscreen") { 
-		font.loadFromFile("./resources/fonts/8bitOperatorPlus8-Bold.ttf");
-		font.setSmooth(true);
-	};
+	LoadScreen() : Scene("loadscreen") { 	};
 
 	void onActive() override {
 		if (!firstSetup) return;
-		else
-		{
-			firstSetup = false;
-		}
+		firstSetup = false;	
 
 		printf("[LOADSCREEN] Setting up\n");
 
-		addEntity(&title);
-
+		font.loadFromFile("./resources/fonts/8bitOperatorPlus8-Bold.ttf");
+		font.setSmooth(true);
+			
 		texts.push_back(&play);
 		texts.push_back(&credits);
 		texts.push_back(&quit);
+
+		addEntity(&title);
 
 		for (auto t : texts)
 		{
@@ -68,7 +65,6 @@ public:
 		sf::sleep(sf::milliseconds(100));
 		centerText(&title, 15);
 
-		
 		float dist = 25 + 10;
 		int i = -1;
 		for (auto t : texts)

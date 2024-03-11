@@ -27,7 +27,6 @@ public:
 		void addEntity(sf::Drawable* e) { scene_entities.push_back(e); }
 	};
 
-
 	static std::map<const std::string, Scene*> scenes;
 	static Scene* getActive()
 	{

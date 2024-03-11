@@ -6,7 +6,7 @@
 void tick()
 {
 	// Input & Math;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace))
 	{
 		if(SceneManager::getActive()->name == "gamescreen")
 			SceneManager::loadScene("loadscreen");
@@ -25,11 +25,11 @@ int main()
 	engine.onUpdate = tick;
 	engine.onStart = start;
 
-	GameScreen g{};
 	LoadScreen l{};
+	GameScreen g{};
 
-	SceneManager::addScene(g.name, &g);
 	SceneManager::addScene(l.name, &l);
+	SceneManager::addScene(g.name, &g);
 
 	engine.init();
 
