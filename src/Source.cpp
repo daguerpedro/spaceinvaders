@@ -3,6 +3,8 @@
 #include "game/scenes/GameScreen.h"
 #include "game/scenes/LoadScreen.h"
 
+#include <Windows.h>
+
 void tick()
 {
 	// Input & Math;
@@ -21,6 +23,12 @@ void start()
 
 int main()
 {
+#ifdef _DEBUG
+	ShowWindow(GetConsoleWindow(), SW_SHOW);
+#else
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+
 	Engine engine{};
 	engine.onUpdate = tick;
 	engine.onStart = start;
