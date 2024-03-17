@@ -15,8 +15,8 @@ void tick()
 
 void start()
 {
-	SceneManager::loadScene("loadscreen");
-	//SceneManager::loadScene("gamescreen");
+	//SceneManager::loadScene("loadscreen");
+	SceneManager::loadScene("gamescreen");
 }
 
 int main()

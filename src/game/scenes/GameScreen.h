@@ -1,13 +1,14 @@
 #pragma once
 
 #include "..\..\engine\Engine.h"
-#include <random>
+#include <ctime> 
+#include <cstdlib>
 
 class GameScreen : public SceneManager::Scene {
 private:
 	int random(int min, int max)
 	{
-		return min + (std::rand() % max);
+		return rand() % (max - min + 1) + min;			
 	};
 
 	class Enemy {
@@ -22,8 +23,16 @@ private:
 		}
 	};
 
+	sf::Text t_pause{};
+	sf::Text t_score{};
+	sf::Text t_lifes{};
+
+	sf::Font font{};
+
 	sf::Texture sTexture{};
-	sf::Texture eTexture{};
+	sf::Texture e1Texture{};
+	sf::Texture e2Texture{};
+	sf::Texture e3Texture{};
 
 	sf::Sprite ship{};
 	std::vector<Enemy*> enemies;
@@ -40,12 +49,39 @@ private:
 		}
 	}
 
-	int level = 1;
+	int level = 0;
+	int lifes = 0;
+	int score = 0;
+
+	int toSpawn = 0;
 
 	float shipspeed = 90;
 
-	bool paused = false;
+	float checkaccumulator = 0;
 
+	float spawnaccumulator = 0;
+	float spawndelay = 1;
+
+	bool paused = false;
+	bool wasPressing = false; 
+
+	void setLife(int l)
+	{
+		lifes = l;
+		std::string t = { "LIFES: " };
+		t += std::to_string(l);
+
+		t_lifes.setString(t);
+	}
+	void setScore(int s)
+	{
+		score = s;
+		std::string t = { "SCORE: " };
+		t += std::to_string(s);
+
+		t_score.setString(t);
+	}
+	
 	void movement()
 	{
 		sf::Vector2f dir{ 0,0 };
@@ -73,51 +109,67 @@ private:
 	}
 	void enemyMove()
 	{
-		for (auto e : enemies)
+		for (auto e	= enemies.begin(); e != enemies.end();)
 		{
-			e->sprite.move({0, e->speed * Engine::instance->deltaTime});
-			if (e->colliding(ship)) //TODO: ENHANCE
-			{
-				//CREATE A DELETE FUNC
-				e->sprite.setPosition(random(0.0f, view().getSize().x), 0);
-			}
+			auto enemy = *e;
+			enemy->sprite.move({0, enemy->speed * Engine::instance->deltaTime});
+
+			if (enemy->colliding(ship) || enemy->sprite.getPosition().y >= view().getSize().y) //TODO: ENHANCE
+			{				
+				scene_entities.erase(find(scene_entities.begin(), scene_entities.end(), &enemy->sprite));
+				enemies.erase(find(enemies.begin(), enemies.end(), enemy));
+
+				setLife(lifes - 1);
+				delete enemy;
+				return;
+			} 
+			e++;
 		}
 	};
-
 	void createEnemy()
 	{		
 		float base = 25;
+		int eType = level > 2 ? random(0, 2) : 0;
 
-		enemies.push_back((new Enemy{ 
-			base + (base * level/7) 
-		}));
+		auto en = new Enemy{
+			base + eType + ((base + eType) * level / 7)
+		};
+
+		enemies.push_back(en);
 		 
-		for (auto en : enemies)
-		{
-			sf::Sprite* e = &en->sprite;
-			e->setTexture(eTexture);
-			e->setOrigin(e->getGlobalBounds().width / 2, e->getGlobalBounds().height / 2);
-			e->setScale(0.1, 0.1);
-			
-			for (int i = 0; i < 10; i++)
-				e->setPosition(random(0.0f, view().getSize().x), 0);
+		sf::Sprite* e = &en->sprite;
 
-			addEntity(&en->sprite);
-		}
+		e->setTexture(
+			eType == 0 ? e1Texture :
+			eType == 1 ? e2Texture :
+			e3Texture
+		);
+
+		float s = eType == 0 ? 0.1 : eType == 1 ? .25 : 0.15;
+		e->setScale(s, s);
+		e->setPosition(random(e->getGlobalBounds().width, view().getSize().x - e->getGlobalBounds().width), -20);		
+		std::cout << e->getPosition().x << std::endl;
+
+		addEntity(&en->sprite);
 	}
+
+	void nextLevel()
+	{
+		level++;
+		toSpawn = random(level + 1, 2 * level);
+	}
+
 public:
-	GameScreen() : Scene("gamescreen") { backcolor = sf::Color{ 119, 119, 119, 255 }; }
+	GameScreen() : Scene("gamescreen") { srand(std::time(NULL));  }
 
 	void onActive() override {
 		if (!firstSetup) return;
-		else
-		{
-			firstSetup = false;
-		}
+		else firstSetup = false;
 
 		printf("[GAMESCREEN] Setting up\n");
-
-#pragma region SHIP SETUP
+		random(0, 1);
+				
+		// SHIP SETUP
 		sTexture.loadFromFile("./resources/sprites/ship1.png");
 		sTexture.setSmooth(true);
 
@@ -126,25 +178,106 @@ public:
 		ship.setOrigin(ship.getGlobalBounds().width / 2, ship.getGlobalBounds().height / 2);
 		ship.setPosition(view().getCenter().x, view().getSize().y - ship.getGlobalBounds().getSize().y);
 		addEntity(&ship);
-#pragma endregion
 
+
+		// LEVEL SETUP BEFORE ENEMY CREATION!
 		level = 0;
-		enemies.clear();
 
-		eTexture.loadFromFile("./resources/sprites/enemy1.png");
-		eTexture.setSmooth(true);
+
+		// ENEMY SETUP
+		e1Texture.loadFromFile("./resources/sprites/enemy1.png");
+		e2Texture.loadFromFile("./resources/sprites/enemy2.png");
+		e3Texture.loadFromFile("./resources/sprites/enemy3.png");
+
+		e1Texture.setSmooth(true);
+		e2Texture.setSmooth(true);
+		e3Texture.setSmooth(true);
 
 		createEnemy();
+
+
+		// TEXTS SETUP
+		font.loadFromFile("./resources/fonts/8bitOperatorPlus8-Bold.ttf");
+		font.setSmooth(true);
+
+		t_score.setFont(font);
+		t_score.setString("SCORE:");
+		t_score.setPosition(10, 10);
+		t_score.setScale(0.7, 0.7);
+		t_score.setFillColor(sf::Color::Cyan);
+
+		t_lifes.setFont(font);
+		t_lifes.setString("LIFES:");
+		t_lifes.setPosition(10, 10 + 25);
+		t_lifes.setScale(0.7, 0.7);
+		t_lifes.setFillColor(sf::Color::Cyan);
+
+		t_pause.setFont(font);
+		t_pause.setString("PAUSED");
+		t_pause.setOrigin(t_pause.getLocalBounds().width / 2, t_pause.getLocalBounds().height / 2);
+		t_pause.setPosition(view().getCenter().x, 150);
+		t_pause.setString(paused ? "PAUSED" : "");
+		t_pause.setFillColor(sf::Color::Red);
+
+		addEntity(&t_score);
+		addEntity(&t_pause);
+		addEntity(&t_lifes);
+
+		setScore(0);
+		setLife(23);
 	}
 
 	void onUpdate() override {
-		if (paused)
+
+		//TODO: MAKE ABLE TO SHOOT, MAKE ENEMY ABLE TO SHOOT, MAKE DEATH SCREEN, MAKE SOUNDS.
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !wasPressing)
 		{
-			//MENU
-			return;
+			wasPressing = true;
+			paused = !paused;
+
+			t_pause.setString(paused ? "PAUSED" : "");
+		}
+		if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && wasPressing)
+		{
+			wasPressing = false;
 		}
 
-		movement();		
-		enemyMove();
+		if (!paused)
+		{
+			auto dt = Engine::instance->deltaTime;
+
+			spawnaccumulator += dt;
+			checkaccumulator += dt;
+
+			movement();		
+			enemyMove();
+
+			if (checkaccumulator >= 1.5f)
+			{
+				checkaccumulator = 0.0;
+
+				if (lifes > 0)
+				{
+					if (enemies.size() == 0 && toSpawn == 0)
+					{
+						nextLevel();
+						return;
+					}		
+				}
+			}
+
+			if (spawnaccumulator >= spawndelay)
+			{
+				spawnaccumulator = 0;
+
+				if (toSpawn > 0 && lifes > 0)
+				{
+					spawndelay = random(1, 5);
+					toSpawn--;
+					createEnemy();
+				}
+			}
+		}
 	}
 };
